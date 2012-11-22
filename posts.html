@@ -1,0 +1,15 @@
+---
+layout: default
+title: Igor Sobreira - All posts
+---
+
+<section id="home">
+  <div class="page-header">
+    <h1>All posts</h1>
+  </div>
+  <ul class="posts unstyled">
+    {% for post in site.posts %}
+    <li><span>{{ post.date | date_to_string }}</span> &raquo; <a href="{{ post.url }}">{{ post.title }}</a></li>
+    {% endfor %}
+  </ul>
+</section>

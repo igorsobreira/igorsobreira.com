@@ -1,0 +1,16 @@
+---
+layout: default
+title: Igor Sobreira - My thoughts on software development
+---
+
+<section id="home">
+  <div class="page-header">
+    <h1>Blog posts</h1>
+  </div>
+  <ul class="posts unstyled">
+    {% for post in site.posts limit:20 %}
+    <li><span>{{ post.date | date_to_string }}</span> &raquo; <a href="{{ post.url }}">{{ post.title }}</a></li>
+    {% endfor %}
+  </ul>
+  <p><a href="/posts.html">see all posts &raquo</a></p>
+</section>
