@@ -12,13 +12,13 @@ Python doesn't have real private methods, so one underline in the beginning of a
 class BaseForm(StrAndUnicode):
     ...
     
-    def get_errors(self):
+    def _get_errors(self):
         "Returns an ErrorDict for the data provided for the form"
-        if self.errors is None:
+        if self._errors is None:
             self.full_clean()
-        return self.errors
+        return self._errors
     
-    errors = property(get_errors)
+    errors = property(_get_errors)
 {% endhighlight %}
 
 This snippet was taken from django source code (django/forms/forms.py). This means `errors` is a property, and it's part of the API, but the method this property calls, `_get_errors`, is "private", so you shouldn't access it.
@@ -29,11 +29,11 @@ This one causes a lot of confusion. It should **not** be used to mark a method a
 
 {% highlight python %}
 class A(object):
-    def method(self):
+    def __method(self):
         print "I'm a method in A"
     
     def method(self):
-        self.method()
+        self.__method()
      
 a = A()
 a.method()
@@ -48,7 +48,7 @@ Fine, as we expected. Now let's subclass `A` and customize `__method`
 
 {% highlight python %}
 class B(A):
-    def method(self):
+    def __method(self):
         print "I'm a method in B"
 
 b = B()
@@ -60,7 +60,7 @@ and now the output is...
     $ python example.py
     I'm a method in A
 
-as you can see, `A.method()` didn't call `B.__method()` as we could expecte. Actually this is the correct behavior for __. So when you create a method starting with __ you're saying that you don't want anybody to override it, it will be accessible just from inside the own class.
+as you can see, `A.method()` didn't call `B.__method()` as we could expect. Actually this is the correct behavior for `__`. So when you create a method starting with `__` you're saying that you don't want anybody to override it, it will be accessible just from inside the own class.
 
 How python does it? Simple, it just renames the method. Take a look:
 
@@ -80,13 +80,13 @@ When you see a method like `__this__`, the rule is simple: don't call it. Why? B
 
 {% highlight pycon %}
 >>> name = "igor"
->>> name.len()
+>>> name.__len__()
 4
 >>> len(name)
 4
 
 >>> number = 10
->>> number.add(20)
+>>> number.__add__(20)
 30
 >>> number + 20
 30
