@@ -98,7 +98,7 @@ def create_button_link(matchobject, line):
 
 Dictionaries are fast, [well](http://hg.python.org/cpython/file/tip/Objects/dictnotes.txt) [designed](http://hg.python.org/cpython/file/tip/Objects/dictobject.c) and are [always being improved](http://mail.python.org/pipermail/python-dev/2012-December/123028.html) by smart people. 
 
-Another interesting builtin data structure is [namedtuple](http://docs.python.org/2/library/collections.html#collections.namedtuple). And it has a clever [implementation](http://hg.python.org/cpython/file/tip/Lib/collections/__init__.py), you should check it out :)
+Another interesting builtin data structure is [namedtuple](http://docs.python.org/2/library/collections.html#collections.namedtuple). And it has a clever [implementation](http://hg.python.org/cpython/file/tip/Lib/collections.py), you should check it out :)
 
 One rule I follow when using dictionaries like the example above is to always modify them with specialized functions. You'll end up with well defined structures and modules that know how to build and manage these structures inside your application.
 
