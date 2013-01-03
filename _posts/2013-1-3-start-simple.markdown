@@ -5,7 +5,7 @@ title: Start simple
 
 Last week I wrote a [post about unnecessary classes](http://www.igorsobreira.com/2012/12/31/unnecessary-classes.html), and that kept me thinking about how common people write classes or more complex designs upfront just because it would be easier to evolve and extend later.
 
-One suggestion I gave was to use a dictionary instead of a class witch had no methods but the constructor. This class was just holding state, data, so a dictionary is enough. Let's start simple...
+One suggestion I gave was to use a dictionary instead of a class which had no methods but the constructor. This class was just holding state, data, so a dictionary is enough. Let's start simple...
 
 I'll stick with this example because it's real code, even if it's purpose is not 100% clear:
 
