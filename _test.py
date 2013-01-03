@@ -29,8 +29,8 @@ def test_redirect_blog_post():
 def test_redirect_static_pages():
     assert_redirect('/talks/', '/talks.html')
     assert_redirect('/books/', '/')
-    assert_redirect('/about/', '/#about')
-    assert_redirect('/contact-me/', '/#contact-me')
+    assert_redirect('/about/', '/about.html')
+    assert_redirect('/contact-me/', '/about.html')
 
 def test_redirect_feeds():
     assert_redirect('/blog/feeds/blog/rss/', '/atom.xml')
