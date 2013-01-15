@@ -15,6 +15,7 @@ def test_valid_pages():
     assert_valid('/talks.html', 'Talks')
     assert_valid('/atom.xml', '<feed xmlns="http://www.w3.org/2005/Atom">')
     assert_valid('/robots.txt', 'User-agent: *')
+    assert_valid('/sitemap.xml', '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">')
 
 # verify all redirects from previous blog
 
