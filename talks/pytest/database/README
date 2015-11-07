@@ -1,0 +1,9 @@
+Sample test for the talk
+
+Install dependencies using Python 3.5:
+
+    $ pip install -r requirements
+
+and run py.test inside this directory
+
+    $ py.test
