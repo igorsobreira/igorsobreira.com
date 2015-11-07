@@ -1,0 +1,596 @@
+<!doctype html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8">
+
+		<title>py.test - testing the python way</title>
+
+		<meta name="description" content="Presentation about py.test - python testing framework">
+		<meta name="author" content="Igor Sobreira">
+
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+
+		<link rel="stylesheet" href="css/reveal.css">
+
+    <link rel="stylesheet" href="css/theme/sky.css" id="theme">
+
+		<!-- Code syntax highlighting -->
+		<link rel="stylesheet" href="lib/css/zenburn.css">
+
+		<!-- Printing and PDF exports -->
+		<script>
+			var link = document.createElement( 'link' );
+			link.rel = 'stylesheet';
+			link.type = 'text/css';
+			link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+			document.getElementsByTagName( 'head' )[0].appendChild( link );
+		</script>
+
+		<!--[if lt IE 9]>
+		<script src="lib/js/html5shiv.js"></script>
+		<![endif]-->
+	</head>
+
+	<body>
+
+		<div class="reveal">
+
+			<img src="css/realgeeks.png" style="position: absolute; bottom: 2px; left: 0px; width: 200px;">
+
+			<!-- Any section element inside of this container is displayed as a slide -->
+			<div class="slides">
+
+				<section>
+					<h1>py.test</h1>
+					<h3>testing the python way</h3>
+					<p><small>By <a href="http://igorsobreira.com">Igor Sobreira</a></small></p>
+				</section>
+
+				<!--
+				WHY
+				-->
+
+				<section>
+				  <h1>why?</h1>
+		          <aside class="notes">
+		            before we start to learn how to use this tool let's just take a quick
+		            step back and as why?
+		            why write automated tests?
+		          </aside>
+				</section>
+
+        		<section>
+					<h2>Automation</li>
+					<h2 class="fragment">Design</h2>
+					<h2 class="fragment">Refactoring</h2>
+					<h2 class="fragment">Specification</h2>
+
+		          <aside class="notes">
+		            <p>automation:
+		              manual tests are slow, repetitive, error prone (we forget steps), and boring</p>
+		            <p>design:
+		              writing tests from the user point of view, ideally with TDD
+		              help to isolate components, build better abstractions</p>
+		            <p>refactoring:
+		              having tests to ensure previous behavior still works after a refactor</p>
+		            <p>specification:
+		              tests are live documentation, specification of the real behavior</p>
+		          </aside>
+		        </section>
+
+				<!--
+				HOW
+				-->
+
+				<section>
+					<h1>how?</h1>
+
+          <aside class="notes">
+            keeping those ideals in mind let's see how to test your python code
+          </aside>
+				</section>
+
+				<section>
+					<pre><code>$ pip install pytest</code></pre>
+				</section>
+
+        <!--
+        CONVERT MILES TO KM
+        -->
+
+        <section>
+          <p>I want a function that convert miles to kilometers</p>
+
+          <pre class="fragment"><code data-trim>
+def test_miles_to_km_one():
+    assert miles_to_km(1) == 1.60934
+          </code></pre>
+          <pre class="fragment"><code data-trim>$ py.test sample1.py</code></pre>
+          <pre class="fragment"><code data-trim>
+======================== test session starts ========================
+platform darwin -- Python 2.7.10 -- py-1.4.26 -- pytest-2.7.0
+rootdir: /Users/igor/Dropbox/Talks/pytest, inifile:
+collected 1 items
+
+sample1.py F
+
+============================= FAILURES ==============================
+_______________________ test_miles_to_km_one ________________________
+
+    def test_miles_to_km_one():
+>       assert miles_to_km(1) == 1.60934
+E       NameError: global name 'miles_to_km' is not defined
+
+sample1.py:4: NameError
+===================== 1 failed in 0.01 seconds ======================</code></pre>
+
+        <aside class="notes">
+          TDD. Verbose output.
+        </aside>
+        </section>
+
+        <section>
+          <pre><code data-trim>
+def miles_to_km(miles):
+    return 1
+          </code></pre>
+
+          <pre class="fragment"><code data-trim>
+============================= FAILURES ==============================
+_______________________ test_miles_to_km_one ________________________
+
+    def test_miles_to_km_one():
+>       assert miles_to_km(1) == 1.60934
+E       assert 1 == 1.60934
+E        +  where 1 = miles_to_km(1)
+
+sample1.py:6: AssertionError
+===================== 1 failed in 0.01 seconds ======================
+          </code></pre>
+        </section>
+
+        <section>
+        <pre><code data-trim>
+def miles_to_km(miles):
+  return miles * 1.60934
+        </code></pre>
+
+        <pre class="fragment"><code data-trim>
+$ py.test sample1.py
+======================== test session starts ========================
+platform darwin -- Python 2.7.10 -- py-1.4.26 -- pytest-2.7.0
+rootdir: /Users/igor/Dropbox/Talks/pytest, inifile:
+collected 1 items
+
+sample1.py .
+
+===================== 1 passed in 0.00 seconds ======================
+</code></pre>
+</section>
+
+<section>
+<pre><code data-trim>
+def test_miles_to_km_zero():
+    assert miles_to_km(0) == 0
+
+def test_miles_to_km_other():
+    assert miles_to_km(42) == 67.59228
+</code></pre>
+
+<pre class="fragment"><code data-trim>
+$ py.test sample1.py
+======================== test session starts ========================
+platform darwin -- Python 2.7.10 -- py-1.4.26 -- pytest-2.7.0
+rootdir: /Users/igor/Dropbox/Talks/pytest, inifile:
+collected 3 items
+
+sample1.py ...
+
+===================== 3 passed in 0.00 seconds ======================
+</code></pre>
+</section>
+
+<section>
+	<h3>py.test does magic with <code>assert</code>!</h3>
+	<p>Here is the normal behavior</p>
+
+<pre><code data-trim>
+>>> assert 1 < 10
+
+>>> assert 1 > 10
+Traceback (most recent call last):
+  File "&lt;stdin&gt;", line 1, in &lt;module&gt;
+AssertionError
+
+>>> assert -5 >= 0, "negatives not allowed"
+Traceback (most recent call last):
+  File "&lt;stdin&gt;", line 1, in &lt;module&gt;
+AssertionError: negatives not allowed
+</code></pre>
+
+</section>
+
+<section>
+  <h4>Exceptions are also part of you API</h4>
+  <p><code>pytest.raises()</code></p>
+  <br>
+<pre><code data-trim>
+import pytest
+
+def test_miles_to_km_strings():
+    with pytest.raises(TypeError):
+        miles_to_km('ten')
+
+def test_miles_to_km_None():
+    with pytest.raises(TypeError):
+        miles_to_km(None)
+</code></pre>
+</section>
+
+<section>
+  <h4>DRY - Don't Repeat Yourself</h4>
+  <p><code>pytest.mark.parametrize()</code></p>
+  <br>
+<pre><code data-trim>
+@pytest.mark.parametrize('value', [
+    'ten',
+    None,
+    [1,2,3],
+])
+def test_miles_to_km_invalid_arguments(value):
+    with pytest.raises(TypeError):
+        miles_to_km(value)
+</code></pre>
+</section>
+
+<section>
+<p><code>pytest.mark.parametrize()</code></p>
+<pre><code data-trim>
+$ py.test sample1.py -v
+========================== test session starts ===========================
+collected 6 items
+
+sample1.py::test_miles_to_km_one PASSED
+sample1.py::test_miles_to_km_zero PASSED
+sample1.py::test_miles_to_km_other PASSED
+sample1.py::test_miles_to_km_invalid_arguments[ten] PASSED
+sample1.py::test_miles_to_km_invalid_arguments[None] PASSED
+sample1.py::test_miles_to_km_invalid_arguments[value2] PASSED
+
+======================== 6 passed in 0.01 seconds ========================
+</code></pre>
+
+  <aside class="notes">
+    is it enough (one, zero, 42, invalid types)? what about negatives?
+    floats?
+    static type system help to avoid invalid type errors, but not invalid
+    values (negatives, overflows)
+  </aside>
+</section>
+
+<section>
+	<h3>Let's build a database abstraction</h3>
+
+	<p>database_test.py</p>
+	<pre><code data-trim>
+from database import Database
+
+def test_database_create_and_find_all():
+    db = Database('mongodb://localhost:27017/registrations')
+
+    db.create({'name': 'igor', 'category': 'OC1'})
+    db.create({'name': 'josh', 'category': 'V1'})
+
+    assert db.find_all() == [
+        {'name': 'igor', 'category': 'OC1'},
+        {'name': 'josh', 'category': 'V1'},
+    ]
+</pre></code>
+</section>
+
+<section>
+	<p>database.py</p>
+<pre><code data-trim>
+from pymongo import MongoClient
+
+class Database:
+
+    def __init__(self, url):
+        self.cli = MongoClient(url)
+        self.db = self.cli.get_default_database()
+        self.coll = self.db[self.db.name]
+
+    def create(self, item):
+        self.coll.insert_one(item)
+
+    def find_all(self):
+        return [item for item in
+                self.coll.find(projection={'_id': False})]
+</pre></code>
+</section>
+
+<section>
+	<pre><code data-trim>
+$ py.test -v
+========================== test session starts ===========================
+
+database_test.py::test_database_create_and_find_all PASSED
+
+======================== 1 passed in 0.05 seconds ========================
+</code></pre>
+<h3>test passes!</h3>
+</section>
+
+<section>
+	<h3>run again... fail!</h3>
+	<pre><code data-trim>
+$ py.test -v --tb=short
+========================== test session starts ===========================
+
+database_test.py::test_database_create_and_find_all FAILED
+
+================================ FAILURES ================================
+___________________ test_database_create_and_find_all ____________________
+database_test.py:10: in test_database_create_and_find_all
+    assert db.find_all() == [
+E   assert [{'category':...ame': 'josh'}] == [{'category': ...ame': 'josh'}]
+E     Left contains more items, first extra item: {'category': 'OC1', 'name': 'igor'}
+E     Full diff:
+E     + [{'category': 'OC1', 'name': 'igor'}, {'category': 'V1', 'name': 'josh'}]
+E     - [{'category': 'OC1', 'name': 'igor'},
+E     -  {'category': 'V1', 'name': 'josh'},
+E     -  {'category': 'OC1', 'name': 'igor'},
+E     -  {'category': 'V1', 'name': 'josh'}]
+======================== 1 failed in 0.06 seconds ========================
+</code></pre>
+</section>
+
+<section>
+	<h2>setup & teardown</h2>
+	<p>Tests need to be isolated</p>
+	<p>Never let one test modify global state and affect other tests</p>
+</section>
+
+<section>
+	<p>database_test.py</p>
+<pre><code data-trim>
+def setup_function(f):
+    global db
+    db = Database('mongodb://localhost:27017/registrations')
+
+def teardown_function(f):
+    global db
+    db.clear()
+
+def test_database_create_and_find_all():
+    db.create({'name': 'igor', 'category': 'OC1'})
+    db.create({'name': 'josh', 'category': 'V1'})
+
+    assert db.find_all() == [
+        {'name': 'igor', 'category': 'OC1'},
+        {'name': 'josh', 'category': 'V1'},
+    ]
+</code></pre>
+<small><a href="https://pytest.org/latest/xunit_setup.html">https://pytest.org/latest/xunit_setup.html</a></small>
+</section>
+
+<section>
+	<h2>Fixtures</h2>
+
+	<blockquote cite="https://en.wikipedia.org/wiki/Test_fixture" class="fragment">
+		"A test fixture is something used to consistently test some item, device, or piece of software."
+		<small><a href="https://en.wikipedia.org/wiki/Test_fixture">https://en.wikipedia.org/wiki/Test_fixture</a></small>
+	</blockquote>
+
+	<blockquote cite="https://pytest.org/latest/fixture.html" class="fragment">
+		"The purpose of test fixtures is to provide a fixed baseline upon which tests can reliably and repeatedly execute"
+		<small><a href="https://pytest.org/latest/fixture.html">https://pytest.org/latest/fixture.html</a></small>
+	</blockquote>
+</section>
+
+
+<section>
+	<p>database_test.py</p>
+<pre><code data-trim>
+import pytest
+from database import Database
+
+@pytest.fixture
+def db(request):
+    db = Database('mongodb://localhost:27017/registrations')
+    request.addfinalizer(db.clear)
+    return db
+
+def test_database_create_and_find_all(db):
+    db.create({'name': 'igor', 'category': 'OC1'})
+    db.create({'name': 'josh', 'category': 'V1'})
+
+    assert db.find_all() == [
+        {'name': 'igor', 'category': 'OC1'},
+        {'name': 'josh', 'category': 'V1'},
+    ]
+</code></pre>
+</section>
+
+<section>
+	<h3>Most powerful features</h3>
+	<small class="fragment">in my opinion...</small>
+
+	<p class="fragment">Use builtin <code>assert</code></p>
+	<p class="fragment">Fixtures with dependency injection</p>
+	<p class="fragment">Filter tests to run with <code>-k</code> and marks</p>
+</section>
+
+<section>
+	<h2><code>pytest -k stringexpr</code></h2>
+	<p>where <code>stringexpr</code> will match a test name, test file name, test <em>mark</em></p>
+	<pre><code data-trim>
+$ pytest -k database
+$ pytest -k create
+$ pytest -k find
+	</code></pre>
+</section>
+
+<section>
+	<h2>Marking test functions</h2>
+
+	<pre><code data-trim>
+@pytest.mark.slow
+def test_slow_integration_test():
+    pass
+	</code></pre>
+
+	<pre><code data-trim>
+$ py.test -m slow
+$ py.test -m "not slow"
+	</code></pre>
+
+	<p><a href="http://pytest.org/latest/example/markers.html">http://pytest.org/latest/example/markers.html</a></p>
+</section>
+
+
+<!--
+			OTHER COOL FEATURES
+ -->
+
+<section>
+	<h1>Other cool features</h1>
+</section>
+
+
+<section>
+	<h3>monkeypatch</h3>
+	<pre><code data-trim>
+import time
+
+def test_with_fixed_time(monkeypatch):
+    def mocked_time():
+        return 123
+    monkeypatch.setattr(time, 'time', mocked_time)
+
+    assert time.time() == 123
+	</code></pre>
+	<small><a href="https://pytest.org/latest/monkeypatch.html">https://pytest.org/latest/monkeypatch.html</a></small>
+</section>
+
+<section>
+	<h3>Knows how to run tests written for</h3>
+	<ul>
+		<li>nose</li>
+		<li>unittest</li>
+		<li>doctest</li>
+	</ul>
+</section>
+
+<section>
+	<h3>Extensible with plugins</h3>
+	<ul>
+		<li><strong>pytest-cov</strong>: coverage reporting</li>
+		<li><strong>pytest-xdist</strong>: distribute tests to CPUs and remote hosts</li>
+		<li><strong>pytest-django</strong>: write tests for django apps</li>
+		<li><strong>pytest-timeout</strong>: timeout tests based on function marks or global definitions</li>
+	</ul>
+
+	<p><small><a href="http://pytest.org/latest/plugins.html">http://pytest.org/latest/plugins.html</a></small></p>
+</section>
+
+<section>
+	<h3>tmpdir fixture</h3>
+
+	<p>Create temporary files and directories</p>
+	<pre><code data-trim>
+def test_create_file(tmpdir):
+    p = tmpdir.mkdir("sub").join("hello.txt")
+    p.write("content")
+
+    assert p.read() == "content"
+    assert len(tmpdir.listdir()) == 1
+	</code></pre>
+
+	<small><a href="https://pytest.org/latest/tmpdir.html">https://pytest.org/latest/tmpdir.html</a></small>
+</section>
+
+<section>
+	<h3>Skip and Expected Failure</h3>
+
+	<pre><code data-trim>
+@pytest.mark.skipif(sys.version_info < (3,3),
+                    reason="requires python3.3")
+def test_function():
+    ...
+	</code></pre>
+
+	<pre><code data-trim>
+@pytest.mark.xfail
+def test_function():
+    ...
+	</code></pre>
+
+	<small><a href="https://pytest.org/latest/skipping.html">https://pytest.org/latest/skipping.html</a></small>
+</section>
+
+<section>
+	<h1>Thanks!</h1>
+
+	<p><a href="https://pytest.org">pytest.org</a></p>
+	<p><a href="http://igorsobreira.com/talks/pytest/">igorsobreira.com/talks/pytest</a></p>
+	<p>igor@igorsobreira.com</p>
+</section>
+
+<!-- ******************************** END ***************************** -->
+
+
+
+
+			</div>
+
+		</div>
+
+		<script src="lib/js/head.min.js"></script>
+		<script src="js/reveal.js"></script>
+
+		<script>
+
+			// Full list of configuration options available at:
+			// https://github.com/hakimel/reveal.js#configuration
+			Reveal.initialize({
+				controls: true,
+				progress: true,
+				history: true,
+				center: true,
+        slideNumber: true,
+
+				transition: 'slide', // none/fade/slide/convex/concave/zoom
+
+				// The "normal" size of the presentation, aspect ratio will be preserved
+		    // when the presentation is scaled to fit different resolutions. Can be
+		    // specified using percentage units.
+		    width: 960,
+		    height: 700,
+
+		    // Factor of the display size that should remain empty around the content
+		    margin: 0.0,
+
+		    // Bounds for smallest/largest possible scale to apply to content
+		    minScale: 0.2,
+		    maxScale: 3.5,
+
+				// Optional reveal.js plugins
+				dependencies: [
+					{ src: 'lib/js/classList.js', condition: function() { return !document.body.classList; } },
+					{ src: 'plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'plugin/highlight/highlight.js', async: true, condition: function() { return !!document.querySelector( 'pre code' ); }, callback: function() { hljs.initHighlightingOnLoad(); } },
+					{ src: 'plugin/zoom-js/zoom.js', async: true },
+					{ src: 'plugin/notes/notes.js', async: true }
+				]
+			});
+
+		</script>
+
+	</body>
+</html>

@@ -1,0 +1,9 @@
+
+Database abstraction
+
+ - fixture will create instance and it's teardown will cleat it
+ - parametrize fixture to test multiple implementations of Database
+ - monkeypatch feature (os.environ)
+
+
+ - understand how pytest does the assert thing
