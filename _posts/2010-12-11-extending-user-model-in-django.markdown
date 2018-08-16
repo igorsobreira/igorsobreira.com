@@ -9,44 +9,36 @@ Django brings a built-in <a href="http://docs.djangoproject.com/en/1.2/topics/au
 
 Basically you create your `UserProfile` model with a `OneToOneField` to `User`:
 
-{% highlight python %}
-class UserProfile(models.Model):
-    user = models.OneToOneField('auth.User')
-    bio = models.TextField()
-    # ...
-{% endhighlight %}
+    class UserProfile(models.Model):
+        user = models.OneToOneField('auth.User')
+        bio = models.TextField()
+        # ...
 
 and define in on settings.py
 
-{% highlight python %}
-AUTH_PROFILE_MODULE = 'accounts.UserProfile'     # app name (dot) model name
-{% endhighlight %}
+    AUTH_PROFILE_MODULE = 'accounts.UserProfile'     # app name (dot) model name
 
 From now on your `User` objects will have a `get_profile()` method.
 
 I personally can't see a reason to use this setting (and I hate "getters" methods), you just need to do this:
 
-{% highlight python %}
-class UserProfile(models.Model):
-    user = models.OneToOneField('auth.User', related_name='profile')
-    bio = models.TextField()
-    # ...
-{% endhighlight %}
+    class UserProfile(models.Model):
+        user = models.OneToOneField('auth.User', related_name='profile')
+        bio = models.TextField()
+        # ...
 
 See the `related_name='profile'` parameter, now you don't need the `get_profile()` method anymore, just use `user_instance.profile`.
 
 But there is a small problem here, if the user instance don't have a profile related to it you will receive an `ObjectDoesNotExist` exception. This happens with `get_profile()` too. And it's not good to handle the exception every time you access the profile. The simplest way to solve this is connect to <a href="http://docs.djangoproject.com/en/1.2/ref/signals/#django.db.models.signals.post_save">`django.db.models.signals.post_save`</a> on the `User` model and create your `UserProfile` instance related to it
 
-{% highlight python %}
-from django.db.models import signals
-from accounts.models import UserProfile
+    from django.db.models import signals
+    from accounts.models import UserProfile
 
-def create_user_profile(sender, instance, created, **kwargs):
-    if created:
-        UserProfile.objects.create(user=instance)
+    def create_user_profile(sender, instance, created, **kwargs):
+        if created:
+            UserProfile.objects.create(user=instance)
 
-signals.post_save.connect(create_user_profile, sender=User)
-{% endhighlight %}
+    signals.post_save.connect(create_user_profile, sender=User)
 
 ## Why subclassing User is a bad idea
 
@@ -69,22 +61,20 @@ If you split features in apps like this it's easier to reuse too, that's the ide
 
 If you're using admin you may want to edit the UserProfile fields in the same page as the User fields, and it's possible using <a href="http://docs.djangoproject.com/en/1.2/ref/contrib/admin/#inlinemodeladmin-objects">admin inlines</a>. Here is how you admin configuration will look like:
 
-{% highlight python %}
-from django.contrib import admin
-from django.contrib.auth.admin import UserAdmin as DjangoUserAdmin
-from django.contrib.auth.models import User
+    from django.contrib import admin
+    from django.contrib.auth.admin import UserAdmin as DjangoUserAdmin
+    from django.contrib.auth.models import User
 
-from accounts.models import UserProfile
+    from accounts.models import UserProfile
 
-class UserProfileInline(admin.TabularInline):
-    model = UserProfile
+    class UserProfileInline(admin.TabularInline):
+        model = UserProfile
 
-class UserAdmin(DjangoUserAdmin):
-    inlines = (UserProfileInline,)
+    class UserAdmin(DjangoUserAdmin):
+        inlines = (UserProfileInline,)
 
-admin.site.unregister(User)
-admin.site.register(User, UserAdmin)
-{% endhighlight %}
+    admin.site.unregister(User)
+    admin.site.register(User, UserAdmin)
 
 ## Conclusion
 As you can see, it quite easy to manage user profiles in django. Although there is a way to hook you profile model in settings.py, you can do it with a simple foreign key. And as usual, there are a few reusable apps around to handle the generic stuff.

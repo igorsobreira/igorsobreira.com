@@ -5,19 +5,6 @@ changefreq: hourly
 ---
 
 <section id="home">
-
-  <div itemscope itemtype="http://data-vocabulary.org/Person">
-    <p>My name is <span itemprop="name">Igor Sobreira</span> and <a href="http://igorsobreira.com" itemprop="url">this</a>
-    is my website. I'm a <span itemprop="title">software developer</span> working at 
-    <span itemprop="affiliation"><a href="http://www.realgeeks.com/">Real Geeks</a></span> and living in Hawaii.
-    </p>
-    <p>When not programming I'm probably <a href="http://wod.igorsobreira.com/">paddling outrigger canoes, windsuring
-      or doing some other workout.</a></p>
-  </div>
-
-  <hr>
-  <br>
-
   <div class="page-header"> <h1>Blog posts</h1> </div>
   <ul class="posts unstyled">
     {% for post in site.posts limit:20 %}
@@ -25,5 +12,4 @@ changefreq: hourly
     {% endfor %}
   </ul>
   <p><a href="/posts.html">see all posts &raquo</a></p>
-
 </section>

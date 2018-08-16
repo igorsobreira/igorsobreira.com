@@ -13,88 +13,78 @@ Why people still write classes like these?
 
 Here is the first class I saw today
 
-{% highlight python %}
-class Buttonate(object):
+    class Buttonate(object):
 
-    @staticmethod
-    def find_files(quiet=False):
-        # ...
-    
-    @staticmethod
-    def find_links(files):
-        # ...
-    
-    @staticmethod
-    def buttonate(buttons, overwrite=False, quiet=False):
-        # ...
+        @staticmethod
+        def find_files(quiet=False):
+            # ...
+        
+        @staticmethod
+        def find_links(files):
+            # ...
+        
+        @staticmethod
+        def buttonate(buttons, overwrite=False, quiet=False):
+            # ...
 
-    @staticmethod
-    def link_parser(file):
-        # ...
-{% endhighlight %}
+        @staticmethod
+        def link_parser(file):
+            # ...
 
 and here is how I would rewrite it:
 
-{% highlight python %}
-def buttonate_find_files(quiet=False):
-    # ...
+    def buttonate_find_files(quiet=False):
+        # ...
 
-def buttonate_find_links(files):
-    # ...
+    def buttonate_find_links(files):
+        # ...
 
-def buttonate_buttonate(buttons, overwrite=False, quiet=False):
-    # ...
+    def buttonate_buttonate(buttons, overwrite=False, quiet=False):
+        # ...
 
-def buttonate_link_parser(file):
-    # ...
-{% endhighlight %}
+    def buttonate_link_parser(file):
+        # ...
 
 I usually just start creating the functions I need, and if I get to this point where I have multiple functions doing related work I just create a module and move them there:
 
-{% highlight python %}
-# new file: buttonate.py
+    # new file: buttonate.py
 
-def find_files(quiet=False):
-    # ...
+    def find_files(quiet=False):
+        # ...
 
-def find_links(files):
-    # ...
+    def find_links(files):
+        # ...
 
-def buttonate(buttons, overwrite=False, quiet=False):
-    # ...
+    def buttonate(buttons, overwrite=False, quiet=False):
+        # ...
 
-def link_parser(file):
-    # ...
-{% endhighlight %}
+    def link_parser(file):
+        # ...
 
 
 ## Use builtin data structures
 
 ...instead of _attributes-only-classes_. Here is the other class I saw today:
 
-{% highlight python %}
-class ButtonLink(object):
-    def __init__(self, matchobject, l):
-      self.__dict__ = matchobject.groupdict()
-      self.name = matchobject.group(0)
-      self.size = int(self.size)
-      self.colors = self.colors[1:].split(".")
-      self.line = l
-{% endhighlight %}
+    class ButtonLink(object):
+        def __init__(self, matchobject, l):
+        self.__dict__ = matchobject.groupdict()
+        self.name = matchobject.group(0)
+        self.size = int(self.size)
+        self.colors = self.colors[1:].split(".")
+        self.line = l
 
 This is a class being used similar to a struct in C. We could use a dictionary here, and a factory function doing the work `__init__` is doing in this example:
 
-{% highlight python %}
-def create_button_link(matchobject, line):
-    button_link = matchobject.groupdict()
-    button_link.update({
-        'name': matchobject.group(0),
-        'size': int(button_link['size']),
-        'colors': button_link['colors'][1:].split("."),
-        'line': line
-    })
-    return button_link
-{% endhighlight %}
+    def create_button_link(matchobject, line):
+        button_link = matchobject.groupdict()
+        button_link.update({
+            'name': matchobject.group(0),
+            'size': int(button_link['size']),
+            'colors': button_link['colors'][1:].split("."),
+            'line': line
+        })
+        return button_link
 
 Dictionaries are fast, [well](http://hg.python.org/cpython/file/tip/Objects/dictnotes.txt) [designed](http://hg.python.org/cpython/file/tip/Objects/dictobject.c) and are [always being improved](http://mail.python.org/pipermail/python-dev/2012-December/123028.html) by smart people. 
 

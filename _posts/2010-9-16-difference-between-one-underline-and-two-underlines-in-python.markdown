@@ -8,18 +8,16 @@ When learning Python many people don't really understand why so much underlines 
 
 Python doesn't have real private methods, so one underline in the beginning of a method or attribute means you shouldn't access this method, because it's not part of the API. It's very common when using properties:
 
-{% highlight python %}
-class BaseForm(StrAndUnicode):
-    ...
-    
-    def _get_errors(self):
-        "Returns an ErrorDict for the data provided for the form"
-        if self._errors is None:
-            self.full_clean()
-        return self._errors
-    
-    errors = property(_get_errors)
-{% endhighlight %}
+    class BaseForm(StrAndUnicode):
+        ...
+
+        def _get_errors(self):
+            "Returns an ErrorDict for the data provided for the form"
+            if self._errors is None:
+                self.full_clean()
+            return self._errors
+
+        errors = property(_get_errors)
 
 This snippet was taken from django source code (django/forms/forms.py). This means `errors` is a property, and it's part of the API, but the method this property calls, `_get_errors`, is "private", so you shouldn't access it.
 
@@ -27,33 +25,29 @@ This snippet was taken from django source code (django/forms/forms.py). This mea
 
 This one causes a lot of confusion. It should **not** be used to mark a method as private, the goal here is to avoid your method to be overridden by a subclass. Let's see an example:
 
-{% highlight python %}
-class A(object):
-    def __method(self):
-        print "I'm a method in A"
-    
-    def method(self):
-        self.__method()
-     
-a = A()
-a.method()
-{% endhighlight %}
+    class A(object):
+        def __method(self):
+            print "I'm a method in A"
 
-The output here is 
+        def method(self):
+            self.__method()
 
-    $ python example.py 
+    a = A()
+    a.method()
+
+The output here is
+
+    $ python example.py
     I'm a method in A
 
 Fine, as we expected. Now let's subclass `A` and customize `__method`
 
-{% highlight python %}
-class B(A):
-    def __method(self):
-        print "I'm a method in B"
+    class B(A):
+        def __method(self):
+            print "I'm a method in B"
 
-b = B()
-b.method()
-{% endhighlight %}
+    b = B()
+    b.method()
 
 and now the output is...
 
@@ -64,10 +58,8 @@ as you can see, `A.method()` didn't call `B.__method()` as we could expect. Actu
 
 How python does it? Simple, it just renames the method. Take a look:
 
-{% highlight python %}
-a = A()
-a._A__method()  # never use this!! please!
-{% endhighlight %}
+    a = A()
+    a._A__method()  # never use this!! please!
 
     $ python example.py
     I'm a method in A
@@ -78,64 +70,57 @@ If you try to access `a.__method()` it won't work either, as I said, `__method` 
 
 When you see a method like `__this__`, the rule is simple: don't call it. Why? Because it means it's a method python calls, not you. Take a look:
 
-{% highlight pycon %}
->>> name = "igor"
->>> name.__len__()
-4
->>> len(name)
-4
+    >>> name = "igor"
+    >>> name.__len__()
+    4
+    >>> len(name)
+    4
 
->>> number = 10
->>> number.__add__(20)
-30
->>> number + 20
-30
-{% endhighlight %}
+    >>> number = 10
+    >>> number.__add__(20)
+    30
+    >>> number + 20
+    30
 
 There is always an operator or native function that calls these _magic methods_. The idea here is to give you the ability to override operators in your own classes. Sometimes it's just a hook python calls in specific situations. `__init__()`, for example, is called when the object is created so you can initialize it. `__new__()` is called to build the instance, and so on...
 
 Here's an example:
 
-{% highlight python %}
-class CrazyNumber(object):
-    
-    def __init__(self, n):
-        self.n = n
-    
-    def __add__(self, other):
-        return self.n - other
-    
-    def __sub__(self, other):
-        return self.n + other
-    
-    def __str__(self):
-        return str(self.n)
+    class CrazyNumber(object):
 
+        def __init__(self, n):
+            self.n = n
 
-num = CrazyNumber(10)
-print num           # 10
-print num + 5       # 5
-print num - 20      # 30
-{% endhighlight %}
+        def __add__(self, other):
+            return self.n - other
+
+        def __sub__(self, other):
+            return self.n + other
+
+        def __str__(self):
+            return str(self.n)
+
+    num = CrazyNumber(10)
+    print num           # 10
+    print num + 5       # 5
+    print num - 20      # 30
 
 Another example:
 
-{% highlight python %}
-class Room(object):
+    class Room(object):
 
-    def __init__(self):
-        self.people = []
+        def __init__(self):
+            self.people = []
 
-    def add(self, person):
-        self.people.append(person)
+        def add(self, person):
+            self.people.append(person)
 
-    def __len__(self):
-        return len(self.people)
+        def __len__(self):
+            return len(self.people)
 
-room = Room()
-room.add("Igor")
-print len(room)     # 1
-{% endhighlight %}
+    room = Room()
+    room.add("Igor")
+    print len(room)     # 1
 
 The <a href="http://docs.python.org/reference/datamodel.html#special-method-names">documentation</a> covers all these special methods.
 

@@ -20,48 +20,42 @@ This is how to use from the command line:
 If your coverage is not 100% your exit status will be 2. This will make your CI fail if your coverage is not enough :).
 You can also verify coverage using the python API, in this case you need to verify the return value from `report()` function, here is an example:
 
-{% highlight python %}
-cov = coverage.coverage(..)
-cov.start()
-ret = run_all_my_tests()
-cov.stop()
-if ret == 0:
-    covered = cov.report()
-    assert covered > 100, "Not enough coverage"
-...
-{% endhighlight %}
+    cov = coverage.coverage(..)
+    cov.start()
+    ret = run_all_my_tests()
+    cov.stop()
+    if ret == 0:
+        covered = cov.report()
+        assert covered > 100, "Not enough coverage"
+    ...
 
 I've created a decorator to make this easier:
 
-{% highlight python %}
-def ensure_coverage(percentage, **cov_options):
-    def decorator(function):
-        @wraps(function)
-        def wrapper(*args, **kw):
-            cov = coverage.coverage(branch=True, **cov_options)
-            cov.start()
-            ret = function(*args, **kw)
-            cov.stop()
-            if ret == 0:
-                covered = cov.report()
-                assert covered >= percentage, \
-                    "Not enough coverage: {0:.2f}%. You need at least {1}%".format(covered, percentage)
-            return ret
-        return wrapper
-    return decorator
-{% endhighlight %}
+    def ensure_coverage(percentage, **cov_options):
+        def decorator(function):
+            @wraps(function)
+            def wrapper(*args, **kw):
+                cov = coverage.coverage(branch=True, **cov_options)
+                cov.start()
+                ret = function(*args, **kw)
+                cov.stop()
+                if ret == 0:
+                    covered = cov.report()
+                    assert covered >= percentage, \
+                        "Not enough coverage: {0:.2f}%. You need at least {1}%".format(covered, percentage)
+                return ret
+            return wrapper
+        return decorator
 
 This is an usage example for this django app I'm working on:
 
-{% highlight python %}
-@ensure_coverage(99, source=['filecabinet'], omit=['filecabinet/tests/*'])
-def runtests():
-    test_runner = get_runner(settings)()
-    return test_runner.run_tests(['filecabinet'])
+    @ensure_coverage(99, source=['filecabinet'], omit=['filecabinet/tests/*'])
+    def runtests():
+        test_runner = get_runner(settings)()
+        return test_runner.run_tests(['filecabinet'])
 
-if __name__ == '__main__':
-    sys.exit(runtests())
-{% endhighlight %}
+    if __name__ == '__main__':
+        sys.exit(runtests())
 
 Here are the related commits, if you're interested:
 
